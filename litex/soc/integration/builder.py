@@ -36,6 +36,7 @@ def _makefile_escape(s):
     return s.replace("\\", "\\\\").replace("$", "$$")
 
 def _check_makefile_path(p):
+    p = p.replace("\\", "/")
     # Make cannot represent spaces in its space-separated path lists (PACKAGE_DIRS etc.) and "#"
     # starts a comment: fail loudly instead of generating a corrupt variables.mak that breaks the
     # software build with confusing errors.
@@ -254,7 +255,7 @@ class Builder:
 
         # Define CPU variables.
         for k, v in export.get_cpu_mak(self.soc.cpu, self.compile_software):
-            define(k, v)
+            define(k, _check_makefile_path(v) if k == "CPU_DIRECTORY" else v)
 
         # Define SoC/Picolibc/Compiler-RT/Software/Include directories.
         picolibc_directory    = remap_path(get_data_mod("software", "picolibc").data_location)

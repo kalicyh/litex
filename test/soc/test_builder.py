@@ -428,7 +428,7 @@ class TestBuilderGeneratedFiles(unittest.TestCase):
             self.assertEqual(csr_json["constants"]["config_clock_frequency"], 100000000)
             self.assertIn("memory_region,csr,0xe0000000,65536", csr_csv)
 
-    def test_variables_contents_escapes_makefile_paths_and_validates_console(self):
+    def test_variables_contents_normalizes_makefile_paths_and_validates_console(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
             builder = _make_builder(tmp_dir, soc=_IncludeFakeSoC(), compile_software=False)
             builder.add_software_package("custom", r"C:\liteX\custom")
@@ -454,7 +454,8 @@ class TestBuilderGeneratedFiles(unittest.TestCase):
                 builder.bios_no_ansi = True
                 variables_no_ansi = builder._get_variables_contents()
 
-            self.assertIn(r"CUSTOM_DIRECTORY=C:\\liteX\\custom", variables)
+            self.assertIn("CUSTOM_DIRECTORY=C:/liteX/custom", variables)
+            self.assertIn("CPU_DIRECTORY=C:/cpu", variables)
             self.assertIn("BIOS_CONSOLE_FULL=1", variables)
             self.assertIn("BIOS_STACK_MARGIN=1024", variables)
             self.assertIn("ALWAYS_LINK_LIBS=libcustom", variables)
