@@ -262,6 +262,7 @@ class Builder:
         compiler_rt_directory = remap_path(get_data_mod("software", "compiler_rt").data_location)
 
         define("SOC_DIRECTORY",         _check_makefile_path(remap_path(soc_directory)))
+        define("PYTHON",               _check_makefile_path(sys.executable))
         define("PICOLIBC_DIRECTORY",    _check_makefile_path(picolibc_directory))
         define("PICOLIBC_FORMAT",       self.bios_format)
         define("LIBC_MODE",             self.libc_mode)

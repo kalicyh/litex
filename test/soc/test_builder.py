@@ -435,27 +435,29 @@ class TestBuilderGeneratedFiles(unittest.TestCase):
             builder.add_software_library("libcustom", always_link=True)
             builder.bios_stack_margin = 0x400
 
-            with patch("litex.soc.integration.builder.export.get_cpu_mak", return_value=[
-                ("TRIPLE",        "--not-found--"),
-                ("CPU",           "unitcpu"),
-                ("CPUFAMILY",     "riscv"),
-                ("CPUFLAGS",      ""),
-                ("CPUENDIANNESS", "little"),
-                ("CLANG",         "0"),
-                ("CPU_DIRECTORY", r"C:\cpu"),
-            ]):
-                variables = builder._get_variables_contents()
+            with patch("litex.soc.integration.builder.sys.executable", r"C:\venv\Scripts\python.exe"):
+                with patch("litex.soc.integration.builder.export.get_cpu_mak", return_value=[
+                    ("TRIPLE",        "--not-found--"),
+                    ("CPU",           "unitcpu"),
+                    ("CPUFAMILY",     "riscv"),
+                    ("CPUFLAGS",      ""),
+                    ("CPUENDIANNESS", "little"),
+                    ("CLANG",         "0"),
+                    ("CPU_DIRECTORY", r"C:\cpu"),
+                ]):
+                    variables = builder._get_variables_contents()
 
-                builder.bios_console = "invalid"
-                with self.assertRaisesRegex(ValueError, "Unsupported BIOS console"):
-                    builder._get_variables_contents()
+                    builder.bios_console = "invalid"
+                    with self.assertRaisesRegex(ValueError, "Unsupported BIOS console"):
+                        builder._get_variables_contents()
 
-                builder.bios_console = "full"
-                builder.bios_no_ansi = True
-                variables_no_ansi = builder._get_variables_contents()
+                    builder.bios_console = "full"
+                    builder.bios_no_ansi = True
+                    variables_no_ansi = builder._get_variables_contents()
 
             self.assertIn("CUSTOM_DIRECTORY=C:/liteX/custom", variables)
             self.assertIn("CPU_DIRECTORY=C:/cpu", variables)
+            self.assertIn("PYTHON=C:/venv/Scripts/python.exe", variables)
             self.assertIn("BIOS_CONSOLE_FULL=1", variables)
             self.assertIn("BIOS_STACK_MARGIN=1024", variables)
             self.assertIn("ALWAYS_LINK_LIBS=libcustom", variables)
