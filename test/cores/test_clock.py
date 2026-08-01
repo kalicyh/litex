@@ -11,6 +11,7 @@ from contextlib import redirect_stdout
 from migen import *
 
 from litex.soc.cores.clock import *
+from litex.soc.cores.clock.common import connect_clkin
 from litex.soc.cores.clock.gowin_gw1n import GW1NOSC, GW1NPLL
 from litex.soc.cores.clock.gowin_gw5a import GW5APLL
 
@@ -64,6 +65,12 @@ class TestClock(unittest.TestCase):
 
     def get_efinix_pll_block(self, pll):
         return pll.platform.toolchain.ifacewriter.get_block(pll.name)
+
+    def test_single_ended_clkin_is_reused(self):
+        module = Module()
+        clkin  = Signal()
+
+        self.assertIs(connect_clkin(module, clkin), clkin)
 
     # Xilinx / Spartan 6
     def test_s6_pll(self):

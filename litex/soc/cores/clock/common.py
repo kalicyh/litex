@@ -137,14 +137,13 @@ def pll_config_error(clkin_freq=None, clkouts=None, msg="No PLL config found"):
     return ValueError(msg)
 
 def connect_clkin(module, clkin, differential=False):
-    clkin_signal = Signal()
     if isinstance(clkin, (Signal, ClockSignal)):
-        module.comb += clkin_signal.eq(clkin)
-    elif differential and isinstance(clkin, Record):
+        return clkin
+    if differential and isinstance(clkin, Record):
+        clkin_signal = Signal()
         module.specials += DifferentialInput(clkin.p, clkin.n, clkin_signal)
-    else:
-        raise ValueError("Unsupported input clock.")
-    return clkin_signal
+        return clkin_signal
+    raise ValueError("Unsupported input clock.")
 
 def connect_clkout(module, cd, clkout, reset=None, with_reset=True):
     register_clkout_cd(module, cd)
